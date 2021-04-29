@@ -5,24 +5,22 @@
     "aws_region": "{{env `AWS_REGION`}}",
     "ami_name": "Prod-CIS-Latest-AMZN-{{isotime \"02-Jan-06 03_04_05\"}}"
   },
-  "builders": [{
+  "builders": [
+    {
     "name": "AWS AMI Builder - CIS",
     "type": "amazon-ebs",
     "region": "{{user `aws_region`}}",
     "source_ami_filter": {
       "filters": {
-        "virtualization-type": "hvm",
-        "name": "amzn-ami-hvm-2017.09.*-gp2",
-        "root-device-type": "ebs"
+        "owner-alias": "aws-marketplace",
+        "product-code": "cvugziknvmxgqna9noibqnnsy",
+        "virtualization-type": "hvm"
       },
-      "owners": ["137112412989", "591542846629", "801119661308",
-        "102837901569", "013907871322", "206029621532",
-        "286198878708", "443319210888"
-      ],
+      "owners": ["aws-marketplace"],
       "most_recent": true
     },
-    "instance_type": "t2.micro",
-    "ssh_username": "ec2-user",
+    "instance_type": "t3.small",
+    "ssh_username": "centos",
     "ami_name": "{{user `ami_name` | clean_ami_name}}",
     "tags": {
       "Name": "{{user `ami_name`}}"
@@ -36,12 +34,19 @@
     "snapshot_tags": {
       "Name": "{{user `ami_name`}}"
     },
-    "ami_description": "Amazon Linux CIS with Cloudwatch Logs agent",
-    "associate_public_ip_address": "true",
+    "ami_description": "Centos 7 with Datadog, Dynatrace, CodeDeploy, Splunk, Spacewalk",
+    "associate_public_ip_address": "false",
     "vpc_id": "{{user `vpc`}}",
     "subnet_id": "{{user `subnet`}}"
-  }],
-  "provisioners": [{
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "file",
+      "source": "install_ddv2.sh",
+      "destination": "/tmp/install_ddv2.sh"
+    },
+    {
       "type": "shell",
       "inline": [
         "sudo pip install ansible==2.7.9"
@@ -50,6 +55,10 @@
     {
       "type": "ansible-local",
       "playbook_file": "ansible/playbook.yaml",
+      "extra_arguments": [
+        "--extra-vars",
+        "\"@ansible/vars.yaml\""
+      ],
       "role_paths": [
         "ansible/roles/common"
       ],
@@ -59,7 +68,7 @@
     {
       "type": "shell",
       "inline": [
-        "rm .ssh/authorized_keys ; sudo rm /root/.ssh/authorized_keys"
+        "rm .ssh/authorized_keys ; sudo rm /root/.ssh/authorized_keys ; rm -rf .aws ; sudo rm -rf /root/.aws"
       ]
     }
   ]

@@ -1,0 +1,4 @@
+---
+
+env: no-env
+secret_id: arn:aws:secretsmanager:us-west-2:243092028889:secret:ops/monitoring/datadog/api/infrastructure-ABe5fW

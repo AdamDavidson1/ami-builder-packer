@@ -1,0 +1,5 @@
+---
+
+# Install agents disabled
+- name: install datadog
+  ansible.builtin.command: ENV={{ env }} SECRET_ID={{ secret }} bash /tmp/install_ddv2.sh

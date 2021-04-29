@@ -3,6 +3,8 @@ version: 0.2
 phases:
   pre_build:
     commands:
+      - aws s3 cp s3://cdm-install-scripts/datadog/datadog.yaml files/etc/datadog-agent/
+      - aws s3 cp s3://cdm-install-scripts/datadog/install_ddv2.sh files/
       - echo "Installing Packer"
       - curl -o packer.zip https://releases.hashicorp.com/packer/1.3.3/packer_1.3.3_linux_amd64.zip && unzip packer.zip
       - echo "Validating Packer template"
